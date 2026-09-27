@@ -1,7 +1,12 @@
 import Image from "next/image";
 import { useState, useMemo } from "react";
 
-const SourceCard = ({ source }: { source: { name: string; url: string } }) => {
+interface SourceCardProps {
+  source: { name: string; url: string };
+  onExclude?: () => void;
+}
+
+const SourceCard = ({ source, onExclude }: SourceCardProps) => {
   const [imageSrc, setImageSrc] = useState(`https://www.google.com/s2/favicons?domain=${source.url}&sz=128`);
 
   const handleImageError = () => {
@@ -20,7 +25,7 @@ const SourceCard = ({ source }: { source: { name: string; url: string } }) => {
   }, [source.url]);
 
   return (
-    <div className="flex h-[79px] w-full items-center gap-3 rounded-lg border border-solid border-gray-700/30 bg-gray-800/30 backdrop-blur-sm shadow-sm px-3 py-2 md:w-auto hover:border-teal-500/30 transition-colors duration-200">
+    <div className="flex min-h-[132px] w-full items-start gap-3 rounded-lg border border-solid border-gray-700/30 bg-gray-800/30 px-3 py-3 shadow-sm backdrop-blur-sm transition-colors duration-200 hover:border-teal-500/30 md:w-[285px]">
       
         <img
           src={imageSrc}
@@ -31,7 +36,7 @@ const SourceCard = ({ source }: { source: { name: string; url: string } }) => {
           onError={handleImageError}  // Update src on error
         />
       
-      <div className="flex max-w-[192px] flex-col justify-center gap-[7px]">
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
         <h6 className="line-clamp-2 text-sm font-medium leading-[normal] text-white">
           {source.name}
         </h6>
@@ -44,6 +49,18 @@ const SourceCard = ({ source }: { source: { name: string; url: string } }) => {
         >
           {formattedUrl}
         </a>
+        <p className="text-xs leading-5 text-gray-400">
+          Selected because its content matched the approved research questions. Inclusion is not a credibility endorsement.
+        </p>
+        {onExclude && (
+          <button
+            type="button"
+            onClick={onExclude}
+            className="min-h-11 self-start rounded-md border border-gray-600 px-3 text-xs font-medium text-gray-200 hover:border-red-400 hover:text-red-200 focus:outline-none focus:ring-2 focus:ring-teal-400"
+          >
+            Exclude source
+          </button>
+        )}
       </div>
     </div>
   );
