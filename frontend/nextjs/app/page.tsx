@@ -19,6 +19,7 @@ import ResearchContent from "@/components/research/ResearchContent";
 import CopilotResearchContent from "@/components/research/CopilotResearchContent";
 import HumanFeedback from "@/components/HumanFeedback";
 import ResearchSidebar from "@/components/ResearchSidebar";
+import ResearchPlanReview from "@/components/ResearchPlanReview";
 import { getAppropriateLayout } from "@/utils/getLayout";
 
 // Import the mobile components
@@ -75,6 +76,7 @@ export default function Home() {
   const [currentResearchId, setCurrentResearchId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isProcessingChat, setIsProcessingChat] = useState(false);
+  const [pendingResearchQuestion, setPendingResearchQuestion] = useState("");
 
   // Use our custom scroll handler
   const { showScrollButton, scrollToBottom } = useScrollHandler(mainContentRef);
@@ -445,6 +447,22 @@ export default function Home() {
     }
   };
 
+  const handlePlanReview = (newQuestion: string) => {
+    if (!newQuestion.trim()) return;
+    setPendingResearchQuestion(newQuestion.trim());
+  };
+
+  const handlePlanApproval = (approvedQuestions: string[]) => {
+    const approvedPrompt = [
+      pendingResearchQuestion,
+      "",
+      "Approved research questions:",
+      ...approvedQuestions.map((item, index) => `${index + 1}. ${item}`),
+    ].join("\n");
+    setPendingResearchQuestion("");
+    handleDisplayResult(approvedPrompt);
+  };
+
   // Mobile-specific implementation for research
   const handleMobileDisplayResult = async (newQuestion: string) => {
     // Update UI state
@@ -681,6 +699,7 @@ export default function Home() {
 
   const handleClickSuggestion = (value: string) => {
     setPromptValue(value);
+    setChatPromptValue(value);
     const element = document.getElementById('input-area');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -928,7 +947,7 @@ export default function Home() {
               <Hero
                 promptValue={promptValue}
                 setPromptValue={setPromptValue}
-                handleDisplayResult={handleDisplayResult}
+                handleDisplayResult={handlePlanReview}
               />
             </>
           )
@@ -1011,6 +1030,13 @@ export default function Home() {
             </div>
           )
         })
+      )}
+      {pendingResearchQuestion && (
+        <ResearchPlanReview
+          question={pendingResearchQuestion}
+          onCancel={() => setPendingResearchQuestion("")}
+          onConfirm={handlePlanApproval}
+        />
       )}
     </>
   );

@@ -52,8 +52,16 @@ export const ResearchResults: React.FC<ResearchResultsProps> = ({
   const sourceComponents = groupedData
     .filter(data => data.type === 'sourceBlock')
     .map((data, index) => (
-      <Sources key={`sourceBlock-${index}`} sources={data.items}/>
+      <Sources
+        key={`sourceBlock-${index}`}
+        sources={data.items}
+        onRequestPerspective={handleClickSuggestion}
+      />
     ));
+
+  const reportSources = groupedData
+    .filter(data => data.type === 'sourceBlock')
+    .flatMap(data => data.items || []);
 
   const imageComponents = groupedData
     .filter(data => data.type === 'imagesBlock')
@@ -79,7 +87,14 @@ export const ResearchResults: React.FC<ResearchResultsProps> = ({
       )}
       {sourceComponents}
       {imageComponents}
-      {finalReport && <Report answer={finalReport.content} researchId={currentResearchId} />}
+      {finalReport && (
+        <Report
+          answer={finalReport.content}
+          researchId={currentResearchId}
+          sources={reportSources}
+          onResearchFurther={handleClickSuggestion}
+        />
+      )}
       {pathData && <AccessReport accessData={pathData.output} report={answer} chatBoxSettings={chatBoxSettings} onShareClick={onShareClick} />}
       {chatComponents}
     </>
